@@ -83,12 +83,12 @@ public:
         bool fork;
         std::string html_url;
         std::string language;
-        int forks_count;
-        int stargazers_count;
-        int watchers_count;
-        int open_issues_count;
+        unsigned int forks_count;
+        unsigned int stargazers_count;
+        unsigned int watchers_count;
+        unsigned int open_issues_count;
         std::string created_at;
-        std::string updated_at;
+        std::string pushed_at;
     };
 
     /**

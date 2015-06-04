@@ -28,6 +28,8 @@ public:
 
 private:
     api::Client client_;
+
+    std::string toStr(const int value);
 };
 
 }

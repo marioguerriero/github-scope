@@ -159,9 +159,9 @@ Client::RepositoryRes Client::repositories(const string& query) {
                 item["forks_count"].toUInt(),
                 item["stargazers_count"].toUInt(),
                 item["watchers_count"].toUInt(),
-                item["open_issue_count"].toUInt(),
+                item["open_issues_count"].toUInt(),
                 item["created_at"].toString().toStdString(),
-                item["updated_at"].toString().toStdString()
+                item["pushed_at"].toString().toStdString()
             }
         );
     }

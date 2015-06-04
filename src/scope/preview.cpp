@@ -72,6 +72,11 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
                           {"label", sc::Variant("View Developer")},
                           {"uri", result["developer_uri"]}
                       });
+    builder.add_tuple({
+                          {"id", sc::Variant("report-issue")},
+                          {"label", sc::Variant("Report Issue")},
+                          {"uri", result["new_issue_uri"]}
+                      });
     actions.add_attribute_value("actions", builder.end());
 
     // Push each of the sections

@@ -9,6 +9,8 @@
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchReply.h>
 
+#include <QDate>
+
 #include <iomanip>
 #include <sstream>
 
@@ -94,8 +96,19 @@ void Query::run(sc::SearchReplyProxy const& reply) {
 
             // Set the rest of the attributes, art, artist, etc
             res.set_art(repository.owner.avatar_url);
-            res["description"] = repository.description;
+
+            QDate createdDate = QDate::fromString(QString::fromStdString(repository.created_at), Qt::ISODate);
+            QDate pushedDate = QDate::fromString(QString::fromStdString(repository.pushed_at), Qt::ISODate);
+            res["description"] = repository.description + "\n\nLanguage: " + repository.language +
+                    "\n\n" + toStr(repository.stargazers_count) + " stargazers, " +
+                    toStr(repository.watchers_count) + " watchers." +
+                    "\n\nCreated at " + createdDate.toString().toStdString() +
+                    "\nLast push " + pushedDate.toString().toStdString() +
+                    ", " + toStr(pushedDate.daysTo(QDate::currentDate())) +
+                    "days ago."
+                    "\n\nOpen issues: " + toStr(repository.open_issues_count);
             res["developer_uri"] = repository.owner.url;
+            res["new_issue_uri"] = repository.html_url + "/issues/new";
 
             // Push the result
             if (!reply->push(res)) {
@@ -111,3 +124,8 @@ void Query::run(sc::SearchReplyProxy const& reply) {
     }
 }
 
+std::string Query::toStr(const int value) {
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
