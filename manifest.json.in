@@ -1,0 +1,15 @@
+{
+    "architecture": "@CLICK_ARCH@",
+    "description": "A simple Unity scope that accesses the network",
+    "framework": "ubuntu-sdk-15.04",
+    "hooks": {
+        "github": {
+            "apparmor": "github.apparmor",
+            "scope": "github"
+        }
+    },
+    "maintainer": "Mario Guerriero <marioguerriero33@gmail.com>",
+    "name": "github-scope.mefrio",
+    "title": "github-scope",
+    "version": "0.1"
+}

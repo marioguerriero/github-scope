@@ -1,0 +1,14 @@
+[ScopeConfig]
+_DisplayName=GitHub Scope
+_Description=This is a Github scope
+Art=screenshot.png
+Author=Mario Guerriero
+Icon=icon.png
+
+[Appearance]
+PageHeader.Logo=logo.png
+PageHeader.background = color:///#FFFFFF
+PageHeader.ForegroundColor = #39CCCC
+BackgroundColor = #FFFFFF
+PageHeader.DividerColor = #39CCCC
+PreviewButtonColor = #F8500F
