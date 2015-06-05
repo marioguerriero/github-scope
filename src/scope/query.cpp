@@ -31,16 +31,35 @@ const static string REPOSITORY_TEMPLATE =
 {
         "schema-version": 1,
         "template": {
-            "category-layout": "grid",
-            "card-size": "medium",
-            "overlay": true
+        "category-layout": "grid",
+        "card-size": "medium",
+        "overlay": true
         },
         "components": {
-            "title": "title",
-            "art" : {
-                "field": "art"
-            },
-            "overlay-color": "overlay"
+        "title": "title",
+        "art" : {
+        "field": "art"
+        },
+        "overlay-color": "overlay"
+        }
+        }
+        )";
+
+/*
+ * 404 page - Nothing return from the query
+ */
+const static string EMPTY_TEMPLATE =
+        R"(
+{
+        "schema-version": 1,
+        "template": {
+        "category-layout": "grid",
+        "card-size": "large"
+        },
+        "components": {
+        "title": "title",
+        "summary": "summary",
+        "type": "type"
         }
         }
         )";
@@ -80,41 +99,69 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         //stringstream ss(stringstream::in | stringstream::out);
         //ss << current.city.name << ", " << current.city.country;
 
-        // Register a category for the current weather, with the title we just built
-        auto repositories_cat = reply->register_category("repositories", "", "",
-                                                     sc::CategoryRenderer(REPOSITORY_TEMPLATE));
+        /**
+          * 404 error
+          */
+        if(repositories.total_count <= 0) {
+            auto empty_cat = reply->register_category("empty",
+                                                      _("Nothing found"), "", sc::CategoryRenderer(EMPTY_TEMPLATE));
 
-        for (const auto &repository : repositories.repositories) {
-            // Iterate over the trackslist
-            sc::CategorisedResult res(repositories_cat);
+            // Create a result
+            sc::CategorisedResult res(empty_cat);
 
-            // We must have a URI
-            res.set_uri(repository.html_url);
-
-            // We also need the track title
-            res.set_title(repository.full_name);
-
-            // Set the rest of the attributes, art, artist, etc
-            res.set_art(repository.owner.avatar_url);
-
-            QDate createdDate = QDate::fromString(QString::fromStdString(repository.created_at), Qt::ISODate);
-            QDate pushedDate = QDate::fromString(QString::fromStdString(repository.pushed_at), Qt::ISODate);
-            res["description"] = repository.description + "\n\nLanguage: " + repository.language +
-                    "\n\n" + toStr(repository.stargazers_count) + " stargazers, " +
-                    toStr(repository.watchers_count) + " watchers." +
-                    "\n\nCreated at " + createdDate.toString().toStdString() +
-                    "\nLast push " + pushedDate.toString().toStdString() +
-                    ", " + toStr(pushedDate.daysTo(QDate::currentDate())) +
-                    "days ago."
-                    "\n\nOpen issues: " + toStr(repository.open_issues_count);
-            res["developer_uri"] = repository.owner.url;
-            res["new_issue_uri"] = repository.html_url + "/issues/new";
+            // Set informations
+            res.set_uri("-1");
+            res.set_title("Nothing here");
+            res["summary"] = "I couldn't find any result. Please, check your connectivity and try again.";
+            res["description"] = "No results found";
 
             // Push the result
             if (!reply->push(res)) {
                 // If we fail to push, it means the query has been cancelled.
                 // So don't continue;
                 return;
+            }
+        }
+        /**
+          * Repository found
+          */
+        else {
+            // Register a category for the current weather, with the title we just built
+            auto repositories_cat = reply->register_category("repositories", _("Repositories"), "",
+                                                             sc::CategoryRenderer(REPOSITORY_TEMPLATE));
+
+            for (const auto &repository : repositories.repositories) {
+                // Iterate over the trackslist
+                sc::CategorisedResult res(repositories_cat);
+
+                // We must have a URI
+                res.set_uri(repository.html_url);
+
+                // We also need the track title
+                res.set_title(repository.full_name);
+
+                // Set the rest of the attributes, art, artist, etc
+                res.set_art(repository.owner.avatar_url);
+
+                QDate createdDate = QDate::fromString(QString::fromStdString(repository.created_at), Qt::ISODate);
+                QDate pushedDate = QDate::fromString(QString::fromStdString(repository.pushed_at), Qt::ISODate);
+                res["description"] = repository.description + "\n\nLanguage: " + repository.language +
+                        "\n\n" + toStr(repository.stargazers_count) + " stargazers, " +
+                        toStr(repository.watchers_count) + " watchers." +
+                        "\n\nCreated at " + createdDate.toString().toStdString() +
+                        "\nLast push " + pushedDate.toString().toStdString() +
+                        ", " + toStr(pushedDate.daysTo(QDate::currentDate())) +
+                        " days ago." +
+                        "\n\nOpen issues: " + toStr(repository.open_issues_count);
+                res["developer_uri"] = repository.owner.url;
+                res["new_issue_uri"] = repository.html_url + "/issues/new";
+
+                // Push the result
+                if (!reply->push(res)) {
+                    // If we fail to push, it means the query has been cancelled.
+                    // So don't continue;
+                    return;
+                }
             }
         }
     } catch (domain_error &e) {

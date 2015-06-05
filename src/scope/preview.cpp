@@ -36,9 +36,10 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
     // Single column layout
     layout1col.add_column( { "image", "header", "actions" });
 
+    if(result["uri"].get_string() != "-1") {
     // Two column layout
     layout2col.add_column( { "image" });
-    layout2col.add_column( { "header", "asctions" });
+    layout2col.add_column( { "header", "actions" });
 
     // Three cokumn layout
     layout3col.add_column( { "image" });
@@ -55,31 +56,36 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
     header.add_attribute_mapping("subtitle", "description");
 
     // Define the image section
-    sc::PreviewWidget image("image", "image");
-    // It has a single source property, mapped to the result's art property
-    image.add_attribute_mapping("source", "art");
+    if(result["uri"].get_string() != "-1") {
+        sc::PreviewWidget image("image", "image");
+        // It has a single source property, mapped to the result's art property
+        image.add_attribute_mapping("source", "art");
 
-    // Define the actions section
-    sc::PreviewWidget actions("actions", "actions");
-    sc::VariantBuilder builder;
-    builder.add_tuple({
-                          {"id", sc::Variant("open")},
-                          {"label", sc::Variant("View")},
-                          {"uri", result["uri"]}
-                      });
-    builder.add_tuple({
-                          {"id", sc::Variant("open-developer")},
-                          {"label", sc::Variant("View Developer")},
-                          {"uri", result["developer_uri"]}
-                      });
-    builder.add_tuple({
-                          {"id", sc::Variant("report-issue")},
-                          {"label", sc::Variant("Report Issue")},
-                          {"uri", result["new_issue_uri"]}
-                      });
-    actions.add_attribute_value("actions", builder.end());
+        // Define the actions section
+        sc::PreviewWidget actions("actions", "actions");
+        sc::VariantBuilder builder;
+        builder.add_tuple({
+                              {"id", sc::Variant("open")},
+                              {"label", sc::Variant("View")},
+                              {"uri", result["uri"]}
+                          });
+        builder.add_tuple({
+                              {"id", sc::Variant("open-developer")},
+                              {"label", sc::Variant("View Developer")},
+                              {"uri", result["developer_uri"]}
+                          });
+        builder.add_tuple({
+                              {"id", sc::Variant("report-issue")},
+                              {"label", sc::Variant("Report Issue")},
+                              {"uri", result["new_issue_uri"]}
+                          });
+        actions.add_attribute_value("actions", builder.end());
 
-    // Push each of the sections
-    reply->push( { image, header, actions });
+        // Push each of the sections
+        reply->push( { image, header, actions });
+    }
+    else {
+        reply->push( { header});
+    }
 }
 
