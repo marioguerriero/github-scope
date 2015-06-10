@@ -33,6 +33,7 @@ private:
 
     // Settings
     void initScope();
+    std::string s_home;
     std::string s_repo;
 };
 

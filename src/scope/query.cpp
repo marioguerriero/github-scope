@@ -269,5 +269,6 @@ void Query::initScope()
     if (config.empty())
         cerr << "CONFIG EMPTY!" << endl;
 
+    s_home = config["home"].get_string();
     s_repo = config["repo"].get_string();
 }

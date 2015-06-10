@@ -1,9 +1,9 @@
-[homePage]
+[home]
 type = string
-defaultValue = Ubuntu
+defaultValue = ubuntu
 displayName = Home Page
 
-[repo]
+[repository]
 type = string
 defaultValue = jquery/jquery
-displayName = Repository to look for code
+displayName = Repository
