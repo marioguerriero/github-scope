@@ -104,13 +104,13 @@ void Query::run(sc::SearchReplyProxy const& reply) {
 
         // Create the root department with an empty string for the 'id' parameter (the first one)
         sc::Department::SPtr all_depts = sc::Department::create("", query, "Repositories");
-client_.setRepo("jquery/jquery");
+
         // Create new departments
         sc::Department::SPtr code_department;
         if(client_.getRepo().empty())
             code_department = sc::Department::create("code", query, "Code");
         else
-            code_department = sc::Department::create("code", query, "Code in " + client_.getRepo());
+            code_department = sc::Department::create("code", query, "Code in " + s_repo);
 
         // Register them as subdepartments of the root
         all_depts->set_subdepartments({code_department});
@@ -128,9 +128,9 @@ client_.setRepo("jquery/jquery");
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
             if(query.department_id() == "") // Root department
-                repositories = client_.repositories("ubuntu-touch");
+                repositories = client_.repositories(s_home);
             else if(query.department_id() == "code")
-                codes = client_.code("addClass", s_repo);
+                codes = client_.code("hello", s_repo);
         } else {
             // otherwise, get the current weather for the search string
             if(query.department_id() == "") // Root department
@@ -270,5 +270,5 @@ void Query::initScope()
         cerr << "CONFIG EMPTY!" << endl;
 
     s_home = config["home"].get_string();
-    s_repo = config["repo"].get_string();
+    s_repo = config["repository"].get_string();
 }
