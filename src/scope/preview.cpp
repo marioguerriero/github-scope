@@ -37,26 +37,25 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
     layout1col.add_column( { "image", "header", "actions" });
 
     if(result["uri"].get_string() != "-1") {
-    // Two column layout
-    layout2col.add_column( { "image" });
-    layout2col.add_column( { "header", "actions" });
+        // Two column layout
+        layout2col.add_column( { "image" });
+        layout2col.add_column( { "header", "actions" });
 
-    // Three cokumn layout
-    layout3col.add_column( { "image" });
-    layout3col.add_column( { "header" });
-    layout3col.add_column( { "actions" });
+        // Three cokumn layout
+        layout3col.add_column( { "image" });
+        layout3col.add_column( { "header" });
+        layout3col.add_column( { "actions" });
 
-    // Register the layouts we just created
-    reply->register_layout( { layout1col, layout2col, layout3col });
+        // Register the layouts we just created
+        reply->register_layout( { layout1col, layout2col, layout3col });
 
-    // Define the header section
-    sc::PreviewWidget header("header", "header");
-    // It has title and a subtitle properties
-    header.add_attribute_mapping("title", "title");
-    header.add_attribute_mapping("subtitle", "description");
+        // Define the header section
+        sc::PreviewWidget header("header", "header");
+        // It has title and a subtitle properties
+        header.add_attribute_mapping("title", "title");
+        header.add_attribute_mapping("subtitle", "description");
 
-    // Define the image section
-    if(result["uri"].get_string() != "-1") {
+        // Define the image section
         sc::PreviewWidget image("image", "image");
         // It has a single source property, mapped to the result's art property
         image.add_attribute_mapping("source", "art");
@@ -79,13 +78,15 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
                               {"label", sc::Variant("Report Issue")},
                               {"uri", result["new_issue_uri"]}
                           });
+        builder.add_tuple({
+                              {"id", sc::Variant("search-code")},
+                              {"label", sc::Variant("Find Code")},
+                              {"uri", result["code_query"]}
+                          });
         actions.add_attribute_value("actions", builder.end());
 
         // Push each of the sections
         reply->push( { image, header, actions });
-    }
-    else {
-        reply->push( { header});
     }
 }
 

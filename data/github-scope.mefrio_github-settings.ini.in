@@ -1,0 +1,9 @@
+[homePage]
+type = string
+defaultValue = Ubuntu
+displayName = Home Page
+
+[repo]
+type = string
+defaultValue = jquery/jquery
+displayName = Repository to look for code

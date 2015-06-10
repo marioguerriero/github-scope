@@ -3,6 +3,7 @@
 # .so file so test tools can find both easily.
 intltool_merge_translations(
   "${CMAKE_SOURCE_DIR}/data/${SCOPE_NAME}.ini.in"
+  "${CMAKE_SOURCE_DIR}/data/${SCOPE_NAME}-settings.ini.in"
   "${CMAKE_CURRENT_BINARY_DIR}/${SCOPE_NAME}.ini"
   ALL
   UTF8
@@ -11,6 +12,7 @@ intltool_merge_translations(
 # Install the scope ini file
 install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/${SCOPE_NAME}.ini"
+  FILE "${CMAKE_SOURCE_DIR}/data/${SCOPE_NAME}-settings.ini.in"
   DESTINATION ${SCOPE_INSTALL_DIR}
 )
 
@@ -19,6 +21,16 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/logo.png"
   @ONLY
   COPYONLY
+)
+
+# Install the scope images
+install(
+  FILES
+    "data/icon.png"
+    "data/logo.png"
+    "data/screenshot.png"
+  DESTINATION
+    ${SCOPE_INSTALL_DIR}
 )
 
 # The sources to build the scope
@@ -80,4 +92,3 @@ install(
   TARGETS scope
   LIBRARY DESTINATION ${SCOPE_INSTALL_DIR}
 )
-

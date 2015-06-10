@@ -8,6 +8,7 @@
 #include <unity/scopes/CategoryRenderer.h>
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchReply.h>
+#include <unity/scopes/Department.h>
 
 #include <QDate>
 
@@ -22,9 +23,7 @@ using namespace api;
 using namespace scope;
 
 /**
- * Define the larger "current weather" layout.
- *
- * The icons are larger.
+ * Repository result template
  */
 const static string REPOSITORY_TEMPLATE =
         R"(
@@ -45,7 +44,26 @@ const static string REPOSITORY_TEMPLATE =
         }
         )";
 
-/*
+/**
+ * Code result remplate
+ */
+const static string CODE_TEMPLATE =
+        R"(
+{
+        "schema-version": 1,
+        "template": {
+        "category-layout": "vertical-journal",
+        "card-size": 32
+        },
+        "components": {
+        "title": "title",
+        "summary":"summary",
+        "type":"type"
+        }
+        }
+        )";
+
+/**
  * 404 page - Nothing return from the query
  */
 const static string EMPTY_TEMPLATE =
@@ -76,33 +94,60 @@ void Query::cancelled() {
 
 void Query::run(sc::SearchReplyProxy const& reply) {
     try {
+        initScope();
+
         // Start by getting information about the query
         const sc::CannedQuery &query(sc::SearchQueryBase::query());
 
         // Trim the query string of whitespace
         string query_string = alg::trim_copy(query.query_string());
 
+        // Create the root department with an empty string for the 'id' parameter (the first one)
+        sc::Department::SPtr all_depts = sc::Department::create("", query, "Repositories");
+client_.setRepo("jquery/jquery");
+        // Create new departments
+        sc::Department::SPtr code_department;
+        if(client_.getRepo().empty())
+            code_department = sc::Department::create("code", query, "Code");
+        else
+            code_department = sc::Department::create("code", query, "Code in " + client_.getRepo());
+
+        // Register them as subdepartments of the root
+        all_depts->set_subdepartments({code_department});
+
+        // Register the root department on the reply
+        reply->register_departments(all_depts);
+
         // the Client is the helper class that provides the results
         // without mixing APIs and scopes code.
         // Add your code to retreive xml, json, or any other kind of result
         // in the client.
         Client::RepositoryRes repositories;
+        Client::CodeRes codes;
+
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
-            repositories = client_.repositories("ubuntu-touch");
+            if(query.department_id() == "") // Root department
+                repositories = client_.repositories("ubuntu-touch");
+            else if(query.department_id() == "code")
+                codes = client_.code("addClass", s_repo);
         } else {
             // otherwise, get the current weather for the search string
-            repositories = client_.repositories(query_string);
+            if(query.department_id() == "") // Root department
+                repositories = client_.repositories(query_string);
+            else if(query.department_id() == "code")
+                codes = client_.code(query_string, s_repo);
         }
 
         // Build up the description for the city
         //stringstream ss(stringstream::in | stringstream::out);
         //ss << current.city.name << ", " << current.city.country;
-
+        std::cout << query.department_id() << std::endl;
         /**
           * 404 error
           */
-        if(repositories.total_count <= 0) {
+        if((repositories.total_count <= 0 && query.department_id() == "")
+                || (codes.total_count <= 0 && query.department_id() == "code")) {
             auto empty_cat = reply->register_category("empty",
                                                       _("Nothing found"), "", sc::CategoryRenderer(EMPTY_TEMPLATE));
 
@@ -114,6 +159,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
             res.set_title("Nothing here");
             res["summary"] = "I couldn't find any result. Please, check your connectivity and try again.";
             res["description"] = "No results found";
+            res["type"] = "empty";
 
             // Push the result
             if (!reply->push(res)) {
@@ -123,12 +169,14 @@ void Query::run(sc::SearchReplyProxy const& reply) {
             }
         }
         /**
-          * Repository found
-          */
-        else {
+         * Repository found
+         */
+        else if(query.department_id() == "") {
             // Register a category for the current weather, with the title we just built
             auto repositories_cat = reply->register_category("repositories", _("Repositories"), "",
                                                              sc::CategoryRenderer(REPOSITORY_TEMPLATE));
+            auto code_cat = reply->register_category("code", _("Code"), "",
+                                                     sc::CategoryRenderer(CODE_TEMPLATE));
 
             for (const auto &repository : repositories.repositories) {
                 // Iterate over the trackslist
@@ -155,6 +203,44 @@ void Query::run(sc::SearchReplyProxy const& reply) {
                         "\n\nOpen issues: " + toStr(repository.open_issues_count);
                 res["developer_uri"] = repository.owner.url;
                 res["new_issue_uri"] = repository.html_url + "/issues/new";
+                res["type"] = "repository";
+
+                sc::CategorisedResult codeRes(code_cat);
+                sc::CannedQuery code_query(query);
+                code_query.set_department_id("code");
+                codeRes.set_uri(code_query.to_uri());
+                res["code_query"] = codeRes.uri();
+                client_.setRepo(repository.full_name);
+
+                // Push the result
+                if (!reply->push(res)) {
+                    // If we fail to push, it means the query has been cancelled.
+                    // So don't continue;
+                    return;
+                }
+            }
+        }
+        /**
+          * Code found
+          */
+        else if(query.department_id() == "code") {
+            // Register a category for the current weather, with the title we just built
+            auto code_cat = reply->register_category("code", _("Code in ") + client_.getRepo(), "",
+                                                     sc::CategoryRenderer(CODE_TEMPLATE));
+
+            for (const auto &code : codes.codes) {
+                // Iterate over the trackslist
+                sc::CategorisedResult res(code_cat);
+
+                // We must have a URI
+                res.set_uri(code.html_url);
+
+                // We also need the track title
+                res.set_title(code.name);
+                res["description"] = code.repository.full_name;
+                res["developer_uri"] = code.repository.owner.url;
+                res["new_issue_uri"] = code.repository.html_url + "/issues/new";
+                res["type"] = "code";
 
                 // Push the result
                 if (!reply->push(res)) {
@@ -175,4 +261,13 @@ std::string Query::toStr(const int value) {
     std::ostringstream oss;
     oss << value;
     return oss.str();
+}
+
+void Query::initScope()
+{
+    unity::scopes::VariantMap config = settings();
+    if (config.empty())
+        cerr << "CONFIG EMPTY!" << endl;
+
+    s_repo = config["repo"].get_string();
 }

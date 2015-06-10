@@ -90,6 +90,7 @@ add_custom_target(hidden_files
     manifest.json.in
     github.apparmor
     data/${SCOPE_NAME}.ini.in
+    data/${SCOPE_NAME}-settings.ini.in
     po/POTFILES.in
     po/${GETTEXT_PACKAGE}.pot
     ${_PO_FILES}

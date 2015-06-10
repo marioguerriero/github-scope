@@ -30,6 +30,10 @@ private:
     api::Client client_;
 
     std::string toStr(const int value);
+
+    // Settings
+    void initScope();
+    std::string s_repo;
 };
 
 }

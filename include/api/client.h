@@ -104,6 +104,26 @@ public:
         RepositoryList repositories;
     };
 
+    /**
+     * Information about a Code result
+     */
+    struct Code {
+        std::string name;
+        std::string path;
+        std::string html_url;
+        Repository repository;
+    };
+
+    typedef std::deque<Code> CodeList;
+
+    /**
+     * A Code searching result
+     */
+    struct CodeRes {
+        unsigned int total_count;
+        CodeList codes;
+    };
+
     Client(Config::Ptr config);
 
     virtual ~Client() = default;
@@ -119,11 +139,20 @@ public:
     virtual RepositoryRes repositories(const std::string &query);
 
     /**
+     * Search for code
+     */
+    virtual CodeRes code(const std::string &query, const std::string &repo);
+
+    /**
      * Cancel any pending queries (this method can be called from a different thread)
      */
     virtual void cancel();
 
     virtual Config::Ptr config();
+
+    // Getter and setter methods
+    std::string getRepo() const;
+    void setRepo(const std::string &value);
 
 protected:
     void get(const core::net::Uri::Path &path,
@@ -144,6 +173,9 @@ protected:
      * Thread-safe cancelled flag
      */
     std::atomic<bool> cancelled_;
+
+private:
+    std::string repo = ""; // Used when searching codes
 };
 
 }
