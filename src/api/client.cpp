@@ -207,7 +207,7 @@ Client::CodeRes Client::code(const string &query, const string &repo = NULL)
                                 owner["login"].toString().toStdString(),
                                 owner["id"].toUInt(),
                                 owner["avatar_url"].toString().toStdString(),
-                                owner["url"].toString().toStdString()
+                                owner["html_url"].toString().toStdString()
                             },
                             repository["name"].toString().toStdString(),
                             repository["full_name"].toString().toStdString(),
