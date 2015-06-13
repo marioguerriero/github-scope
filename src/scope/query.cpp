@@ -124,6 +124,12 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         Client::RepositoryRes repositories;
         Client::CodeRes codes;
 
+        // Reset cached informations if users does not want them to be saved
+        if(!s_save) {
+            c_query = "ubuntu-touch";
+            c_repo = "torvalds/linux";
+        }
+
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
             if(query.department_id() == "")
