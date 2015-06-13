@@ -33,10 +33,31 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
     // Column layout definitions are optional.
     // However, we recommend that scopes define layouts for the best visual appearance.
 
-    // Single column layout
-    layout1col.add_column( { "image", "header", "actions" });
+    /**
+      * No results
+      */
+    if(result["type"].get_string() == "empty") {
+        layout1col.add_column( { "header"});
 
-    if(result["uri"].get_string() != "-1") {
+        // Register the layouts we just created
+        reply->register_layout( { layout1col });
+
+        // Define the header section
+        sc::PreviewWidget header("header", "header");
+        // It has title and a subtitle properties
+        header.add_attribute_mapping("title", "title");
+        header.add_attribute_mapping("subtitle", "description");
+
+        // Push each of the sections
+        reply->push( { header});
+    }
+    /**
+      * Repository preview
+      */
+    else if(result["type"].get_string() == "repository") {
+        // Single column layout
+        layout1col.add_column( { "image", "header", "actions" });
+
         // Two column layout
         layout2col.add_column( { "image" });
         layout2col.add_column( { "header", "actions" });
@@ -87,6 +108,45 @@ void Preview::run(sc::PreviewReplyProxy const& reply) {
 
         // Push each of the sections
         reply->push( { image, header, actions });
+    }
+    /**
+      * Code result
+      */
+    else if(result["type"].get_string() == "code") {
+        // Single column layout
+        layout1col.add_column( { "header", "actions" });
+
+        // Register the layouts we just created
+        reply->register_layout( { layout1col });
+
+        // Define the header section
+        sc::PreviewWidget header("header", "header");
+        // It has title and a subtitle properties
+        header.add_attribute_mapping("title", "title");
+        header.add_attribute_mapping("subtitle", "description");
+
+        // Define the actions section
+        sc::PreviewWidget actions("actions", "actions");
+        sc::VariantBuilder builder;
+        builder.add_tuple({
+                              {"id", sc::Variant("open")},
+                              {"label", sc::Variant("View")},
+                              {"uri", result["uri"]}
+                          });
+        builder.add_tuple({
+                              {"id", sc::Variant("open-developer")},
+                              {"label", sc::Variant("View Developer")},
+                              {"uri", result["developer_uri"]}
+                          });
+        builder.add_tuple({
+                              {"id", sc::Variant("report-issue")},
+                              {"label", sc::Variant("Report Issue")},
+                              {"uri", result["new_issue_uri"]}
+                          });
+        actions.add_attribute_value("actions", builder.end());
+
+        // Push each of the sections
+        reply->push( { header, actions });
     }
 }
 
