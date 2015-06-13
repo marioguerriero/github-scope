@@ -1,9 +1,4 @@
-[home]
-type = string
-defaultValue = ubuntu
-displayName = Home Page
-
-[repository]
-type = string
-defaultValue = jquery/jquery
-displayName = Repository
+[saveState]
+type = boolean
+defaultValue = true
+displayName = Save last searched query

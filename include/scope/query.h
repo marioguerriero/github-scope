@@ -26,6 +26,9 @@ public:
 
     void run(const unity::scopes::SearchReplyProxy &reply) override;
 
+    std::string getCachePath() const;
+    void setCachePath(const std::string &value);
+
 private:
     api::Client client_;
 
@@ -33,8 +36,14 @@ private:
 
     // Settings
     void initScope();
-    std::string s_home;
-    std::string s_repo;
+    bool s_save;
+
+    // Cache informations
+    std::string cachePath;
+    std::string c_query;
+    std::string c_repo;
+    void loadCache();
+    void updateCache();
 };
 
 }

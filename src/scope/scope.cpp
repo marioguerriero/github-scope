@@ -33,7 +33,9 @@ void Scope::stop() {
 sc::SearchQueryBase::UPtr Scope::search(const sc::CannedQuery &query,
                                         const sc::SearchMetadata &metadata) {
     // Boilerplate construction of Query
-    return sc::SearchQueryBase::UPtr(new Query(query, metadata, config_));
+    Query *q = new Query(query, metadata, config_);
+    q->setCachePath(cache_directory());
+    return sc::SearchQueryBase::UPtr(q);
 }
 
 sc::PreviewQueryBase::UPtr Scope::preview(sc::Result const& result,

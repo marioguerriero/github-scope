@@ -35,6 +35,13 @@ configure_file(
   COPYONLY
 )
 
+configure_file(
+  "${CMAKE_SOURCE_DIR}/data/icon.png"
+  "${CMAKE_CURRENT_BINARY_DIR}/icon.png"
+  @ONLY
+  COPYONLY
+)
+
 # The sources to build the scope
 set(SCOPE_SOURCES
   api/client.cpp

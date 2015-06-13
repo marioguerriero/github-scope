@@ -11,6 +11,7 @@
 #include <unity/scopes/Department.h>
 
 #include <QDate>
+#include <QSettings>
 
 #include <iomanip>
 #include <sstream>
@@ -95,6 +96,7 @@ void Query::cancelled() {
 void Query::run(sc::SearchReplyProxy const& reply) {
     try {
         initScope();
+        loadCache();
 
         // Start by getting information about the query
         const sc::CannedQuery &query(sc::SearchQueryBase::query());
@@ -107,10 +109,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
 
         // Create new departments
         sc::Department::SPtr code_department;
-        if(client_.getRepo().empty())
-            code_department = sc::Department::create("code", query, "Code");
-        else
-            code_department = sc::Department::create("code", query, "Code in " + s_repo);
+        code_department = sc::Department::create("code", query, "Code in " + c_repo);
 
         // Register them as subdepartments of the root
         all_depts->set_subdepartments({code_department});
@@ -127,22 +126,24 @@ void Query::run(sc::SearchReplyProxy const& reply) {
 
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
-            if(query.department_id() == "") // Root department
-                repositories = client_.repositories(s_home);
+            if(query.department_id() == "")
+                repositories = client_.repositories("ubuntu-touch");
             else if(query.department_id() == "code")
-                codes = client_.code("hello", s_repo);
+                codes = client_.code("print", c_repo);
         } else {
             // otherwise, get the current weather for the search string
-            if(query.department_id() == "") // Root department
+            if(query.department_id() == "") {
                 repositories = client_.repositories(query_string);
+                c_query = query_string;
+            }
             else if(query.department_id() == "code")
-                codes = client_.code(query_string, s_repo);
+                codes = client_.code(query_string, c_repo);
         }
 
         // Build up the description for the city
         //stringstream ss(stringstream::in | stringstream::out);
         //ss << current.city.name << ", " << current.city.country;
-        std::cout << query.department_id() << std::endl;
+
         /**
           * 404 error
           */
@@ -157,7 +158,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
             // Set informations
             res.set_uri("-1");
             res.set_title("Nothing here");
-            res["summary"] = "I couldn't find any result. Please, check your connectivity and try again.";
+            res["summary"] = "I couldn't find any result. Please, change you query or check your connectivity and try again.";
             res["description"] = "No results found";
             res["type"] = "empty";
 
@@ -255,6 +256,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         cerr << e.what() << endl;
         reply->error(current_exception());
     }
+    updateCache();
 }
 
 std::string Query::toStr(const int value) {
@@ -269,6 +271,31 @@ void Query::initScope()
     if (config.empty())
         cerr << "CONFIG EMPTY!" << endl;
 
-    s_home = config["home"].get_string();
-    s_repo = config["repository"].get_string();
+    s_save = config["saveState"].get_bool();
+}
+
+std::string Query::getCachePath() const
+{
+    return cachePath;
+}
+
+void Query::setCachePath(const std::string &value)
+{
+    cachePath = value;
+}
+
+
+
+void Query::loadCache()
+{
+    QSettings cache(QString::fromUtf8(cachePath.c_str()), QSettings::NativeFormat);
+    c_query = cache.value("query", "module").toString().toStdString();
+    c_repo = cache.value("repo", "linux/linux").toString().toStdString();
+}
+
+void Query::updateCache()
+{
+    QSettings cache(QString::fromUtf8(cachePath.c_str()), QSettings::NativeFormat);
+    cache.setValue("query", QVariant(c_query.c_str()));
+    cache.setValue("repo", QVariant(c_repo.c_str()));
 }

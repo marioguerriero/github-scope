@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-10 21:00+0200\n"
+"POT-Creation-Date: 2015-06-13 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,20 +25,20 @@ msgstr ""
 msgid "This is a Github scope"
 msgstr ""
 
-#: ../src/scope/query.cpp:152
+#: ../src/scope/query.cpp:153
 msgid "Nothing found"
 msgstr ""
 
 #. Register a category for the current weather, with the title we just built
-#: ../src/scope/query.cpp:176
+#: ../src/scope/query.cpp:177
 msgid "Repositories"
 msgstr ""
 
-#: ../src/scope/query.cpp:178
+#: ../src/scope/query.cpp:179
 msgid "Code"
 msgstr ""
 
 #. Register a category for the current weather, with the title we just built
-#: ../src/scope/query.cpp:228
+#: ../src/scope/query.cpp:229
 msgid "Code in "
 msgstr ""
