@@ -7,6 +7,7 @@ Icon=icon.png
 
 [Appearance]
 PageHeader.Logo=logo.png
+PageHeader.Icon=icon.png
 PageHeader.background = color:///#FFFFFF
 PageHeader.ForegroundColor = #39CCCC
 BackgroundColor = #FFFFFF

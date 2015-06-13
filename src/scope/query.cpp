@@ -127,9 +127,9 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
             if(query.department_id() == "")
-                repositories = client_.repositories("ubuntu-touch");
+                repositories = client_.repositories(c_query);
             else if(query.department_id() == "code")
-                codes = client_.code("print", c_repo);
+                codes = client_.code(c_query, c_repo);
         } else {
             // otherwise, get the current weather for the search string
             if(query.department_id() == "") {
@@ -138,6 +138,8 @@ void Query::run(sc::SearchReplyProxy const& reply) {
             }
             else if(query.department_id() == "code")
                 codes = client_.code(query_string, c_repo);
+            // Update cached query
+            c_query = query_string;
         }
 
         // Build up the description for the city
@@ -251,12 +253,13 @@ void Query::run(sc::SearchReplyProxy const& reply) {
                 }
             }
         }
+        // Update cache
+        updateCache();
     } catch (domain_error &e) {
         // Handle exceptions being thrown by the client API
         cerr << e.what() << endl;
         reply->error(current_exception());
     }
-    updateCache();
 }
 
 std::string Query::toStr(const int value) {
