@@ -147,7 +147,7 @@ Client::RepositoryRes Client::repositories(const string& query) {
                             owner["login"].toString().toStdString(),
                             owner["id"].toUInt(),
                             owner["avatar_url"].toString().toStdString(),
-                            owner["url"].toString().toStdString()
+                            owner["html_url"].toString().toStdString()
                         },
                         item["name"].toString().toStdString(),
                         item["full_name"].toString().toStdString(),
