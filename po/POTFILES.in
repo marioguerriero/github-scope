@@ -1,4 +1,4 @@
-[type: gettext/ini] data/github-scope.mefrio_github.ini.in
+[type: gettext/ini] data/github-scope.mefrio-g_github.ini.in
 include/api/config.h
 include/api/client.h
 include/scope/preview.h

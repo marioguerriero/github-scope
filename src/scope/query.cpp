@@ -9,6 +9,7 @@
 #include <unity/scopes/QueryBase.h>
 #include <unity/scopes/SearchReply.h>
 #include <unity/scopes/Department.h>
+#include <unity/scopes/OptionSelectorFilter.h>
 
 #include <QDate>
 #include <QSettings>
@@ -86,6 +87,7 @@ const static string EMPTY_TEMPLATE =
 Query::Query(const sc::CannedQuery &query, const sc::SearchMetadata &metadata,
              Config::Ptr config) :
     sc::SearchQueryBase(query, metadata), client_(config) {
+
 }
 
 void Query::cancelled() {
@@ -104,6 +106,16 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         // Trim the query string of whitespace
         string query_string = alg::trim_copy(query.query_string());
 
+        /*std::string s_homepage;
+        sc::Filters filters;
+        sc::OptionSelectorFilter::SPtr optionsFilter = sc::OptionSelectorFilter::create("category", s_homepage);
+        optionsFilter->set_display_hints(1);
+        optionsFilter->add_option("movie", _("Movies"));
+        optionsFilter->add_option("tv", _("TV-series"));
+        optionsFilter->active_options(query.filter_state());
+        filters.push_back(optionsFilter);
+        reply->push(filters, query.filter_state());
+
         // Create the root department with an empty string for the 'id' parameter (the first one)
         sc::Department::SPtr all_depts = sc::Department::create("", query, "Repositories");
 
@@ -116,7 +128,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
 
         // Register the root department on the reply
         reply->register_departments(all_depts);
-
+*/
         // the Client is the helper class that provides the results
         // without mixing APIs and scopes code.
         // Add your code to retreive xml, json, or any other kind of result
@@ -125,25 +137,25 @@ void Query::run(sc::SearchReplyProxy const& reply) {
         Client::CodeRes codes;
 
         // Reset cached informations if users does not want them to be saved
-        if(!s_save) {
+        /*if(!s_save) {
             c_query = "ubuntu-touch";
             c_repo = "torvalds/linux";
-        }
+        }*/
 
         if (query_string.empty()) {
             // If the string is empty, get the current weather for London
-            if(query.department_id() == "")
-                repositories = client_.repositories(c_query);
-            else if(query.department_id() == "code")
-                codes = client_.code(c_query, c_repo);
+            //if(query.department_id() == "")
+                repositories = client_.repositories(c_query, s_name, s_description, s_readme);
+            //else if(query.department_id() == "code")
+            //    codes = client_.code(c_query, c_repo);
         } else {
             // otherwise, get the current weather for the search string
-            if(query.department_id() == "") {
-                repositories = client_.repositories(query_string);
-                c_query = query_string;
-            }
-            else if(query.department_id() == "code")
-                codes = client_.code(query_string, c_repo);
+            //if(query.department_id() == "") {
+                repositories = client_.repositories(query_string, s_name, s_description, s_readme);
+            //    c_query = query_string;
+            //}
+            //else if(query.department_id() == "code")
+            //    codes = client_.code(query_string, c_repo);
             // Update cached query
             c_query = query_string;
         }
@@ -214,12 +226,12 @@ void Query::run(sc::SearchReplyProxy const& reply) {
                 res["new_issue_uri"] = repository.html_url + "/issues/new";
                 res["type"] = "repository";
 
-                sc::CategorisedResult codeRes(code_cat);
-                sc::CannedQuery code_query(query);
-                code_query.set_department_id("code");
-                codeRes.set_uri(code_query.to_uri());
-                res["code_query"] = codeRes.uri();
-                client_.setRepo(repository.full_name);
+                //sc::CategorisedResult codeRes(code_cat);
+                //sc::CannedQuery code_query(query);
+                //code_query.set_department_id("code");
+                //codeRes.set_uri(code_query.to_uri());
+                res["code_query"] = repository.html_url + "/search";
+                //c_repo = repository.full_name;
 
                 // Push the result
                 if (!reply->push(res)) {
@@ -234,7 +246,7 @@ void Query::run(sc::SearchReplyProxy const& reply) {
           */
         else if(query.department_id() == "code") {
             // Register a category for the current weather, with the title we just built
-            auto code_cat = reply->register_category("code", _("Code in ") + client_.getRepo(), "",
+            auto code_cat = reply->register_category("code", _("Code in ") + c_repo, "",
                                                      sc::CategoryRenderer(CODE_TEMPLATE));
 
             for (const auto &code : codes.codes) {
@@ -280,7 +292,9 @@ void Query::initScope()
     if (config.empty())
         cerr << "CONFIG EMPTY!" << endl;
 
-    s_save = config["saveState"].get_bool();
+    s_name = config["searchName"].get_bool();
+    s_description = config["searchDescription"].get_bool();
+    s_readme= config["searchReadme"].get_bool();
 }
 
 std::string Query::getCachePath() const
@@ -292,8 +306,6 @@ void Query::setCachePath(const std::string &value)
 {
     cachePath = value;
 }
-
-
 
 void Query::loadCache()
 {

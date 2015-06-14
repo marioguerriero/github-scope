@@ -113,7 +113,8 @@ Client::UserRes Client::users(const string& query) {
     return result;
 }
 
-Client::RepositoryRes Client::repositories(const string& query) {
+Client::RepositoryRes Client::repositories(const string& query,
+                                           bool name, bool description, bool readme) {
     // This is the method that we will call from the Query class.
     // It connects to an HTTP source and returns the results.
 
@@ -124,9 +125,14 @@ Client::RepositoryRes Client::repositories(const string& query) {
     // Build a URI and get the contents.
     // The fist parameter forms the path part of the URI.
     // The second parameter forms the CGI parameters.
+    std::string in = "+in:";
+    if(name) in += "name,";
+    if(description) in += "description,";
+    if(readme) in += "readme,";
+    in = in.substr(0, in.size()-1);
     get(
     { "search", "repositories" },
-    { { "q", query } },
+    { { "q", query + in } },
                 root);
     // e.g. http://api.openweathermap.org/data/2.5/weather?q=QUERY&units=metric
 

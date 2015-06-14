@@ -36,7 +36,9 @@ private:
 
     // Settings
     void initScope();
-    bool s_save;
+    bool s_name;
+    bool s_description;
+    bool s_readme;
 
     // Cache informations
     std::string cachePath;

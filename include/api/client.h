@@ -136,7 +136,7 @@ public:
     /**
      * Search for repositories
      */
-    virtual RepositoryRes repositories(const std::string &query);
+    virtual RepositoryRes repositories(const std::string &query, bool name, bool description, bool readme);
 
     /**
      * Search for code

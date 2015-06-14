@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-13 15:20+0200\n"
+"POT-Creation-Date: 2015-06-14 19:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../data/github-scope.mefrio_github.ini.in.h:1
+#: ../data/github-scope.mefrio-g_github.ini.in.h:1
 msgid "GitHub Scope"
 msgstr ""
 
-#: ../data/github-scope.mefrio_github.ini.in.h:2
+#: ../data/github-scope.mefrio-g_github.ini.in.h:2
 msgid "This is a Github scope"
 msgstr ""
 
-#: ../src/scope/query.cpp:161
+#: ../src/scope/query.cpp:173
 msgid "Nothing found"
 msgstr ""
 
 #. Register a category for the current weather, with the title we just built
-#: ../src/scope/query.cpp:185
+#: ../src/scope/query.cpp:197
 msgid "Repositories"
 msgstr ""
 
-#: ../src/scope/query.cpp:187
+#: ../src/scope/query.cpp:199
 msgid "Code"
 msgstr ""
 
 #. Register a category for the current weather, with the title we just built
-#: ../src/scope/query.cpp:237
+#: ../src/scope/query.cpp:249
 msgid "Code in "
 msgstr ""

@@ -3,7 +3,6 @@
 # .so file so test tools can find both easily.
 intltool_merge_translations(
   "${CMAKE_SOURCE_DIR}/data/${SCOPE_NAME}.ini.in"
-  #"${CMAKE_SOURCE_DIR}/data/${SCOPE_NAME}-settings.ini.in"
   "${CMAKE_CURRENT_BINARY_DIR}/${SCOPE_NAME}.ini"
   ALL
   UTF8

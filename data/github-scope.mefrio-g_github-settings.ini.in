@@ -1,4 +1,14 @@
-[saveState]
+[searchName]
 type = boolean
 defaultValue = true
-displayName = Save last searched query
+displayName = Search in repositories name
+
+[searchDescription]
+type = boolean
+defaultValue = true
+displayName = Search in repositories description
+
+[searchReadme]
+type = boolean
+defaultValue = true
+displayName = Search in READMEs
